@@ -19,10 +19,18 @@ export async function quote(ctx) {
 
 export function printQuote(q) {
   const m = (v) => money(v, q.currency);
-  log(`Магазин TF2: ${m(q.storePrice)} | ТП мин. цена продажи: ${m(q.market.lowestSell)}`
-    + ` | макс. заявка на покупку: ${m(q.market.highestBuy)}`);
-  log(`Выставим за ${m(q.buyerPrice)} -> получим ${m(q.receive)} | убыток ${m(q.loss)}`
-    + ` (${q.lossPercent.toFixed(1)}%) | ~${q.points} очков | ${m(Math.round(q.costPer100Points))} за 100 очков`);
+  const rows = [
+    ['Цена ключа в магазине TF2', m(q.storePrice)],
+    ['Самая низкая цена на ТП сейчас', m(q.market.lowestSell)],
+    ['Выставим ключ за', m(q.buyerPrice)],
+    ['Получим после комиссии ТП', m(q.receive)],
+    ['Потеря на одном ключе', `${m(q.loss)} (${q.lossPercent.toFixed(1)}%)`],
+    ['Очков Steam за ключ', `~${q.points}`],
+    ['Цена 100 очков Steam', m(Math.round(q.costPer100Points))],
+  ];
+  console.log('');
+  for (const [k, v] of rows) console.log(`  ${k.padEnd(32, '.')} ${v}`);
+  console.log('');
 }
 
 /** Checks the safety limits. Returns a reason string if the cycle must be skipped. */
@@ -118,7 +126,7 @@ export async function sell(ctx) {
   if (listed && !config.dryRun) {
     await sleep(3000);
     const n = await acceptMarketConfirmations(ctx.community);
-    log(`Подтверждено лотов: ${n}/${listed}`);
+    if (config.identitySecret) log(`Подтверждено лотов: ${n}/${listed}`);
   }
   return listed;
 }

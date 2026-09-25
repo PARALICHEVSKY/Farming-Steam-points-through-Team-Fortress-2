@@ -28,6 +28,11 @@ function respond(conf) {
  * Returns the number of accepted confirmations.
  */
 export async function acceptMarketConfirmations(community, { attempts = 3 } = {}) {
+  if (!config.identitySecret) {
+    log('Автоподтверждение выключено (нет maFile). Откройте приложение Steam на телефоне →');
+    log('«Подтверждения» и подтвердите лоты на Торговой площадке.');
+    return 0;
+  }
   let accepted = 0;
   for (let i = 0; i < attempts; i++) {
     const confs = (await getConfirmations(community)).filter((c) => Number(c.type) === MARKET_LISTING);

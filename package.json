@@ -8,7 +8,8 @@
     "tf2-points": "src/index.js"
   },
   "scripts": {
-    "start": "node src/index.js run",
+    "start": "node src/index.js",
+    "setup": "node src/index.js setup",
     "run-cycle": "node src/index.js run",
     "buy": "node src/index.js buy",
     "sell": "node src/index.js sell",

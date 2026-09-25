@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { config } from './config.js';
+import { money } from './util.js';
 
 const FILE = () => path.join(config.dataDir, 'ledger.json');
 
@@ -76,4 +77,23 @@ export function stats(ledger = loadLedger()) {
     costPer100Points: listedPoints ? Math.round((listedLoss / listedPoints) * 100) : 0,
     recent: [...ledger.listings].reverse().slice(0, 50),
   };
+}
+
+export function printStats() {
+  const s = stats();
+  const m = (v) => money(v, s.currency ?? '');
+  const rows = [
+    ['Куплено ключей', s.keysBought],
+    ['Выставлено на ТП', s.keysListed],
+    ['Ждут продажи', s.keysPending],
+    ['Потрачено в магазине', m(s.spent)],
+    ['Вернётся на кошелёк (ожидается)', m(s.expectedProceeds)],
+    ['Потеряно на выставленных', m(s.listedLoss)],
+    ['Средняя потеря на ключ', m(s.avgLossPerKey)],
+    ['Очков Steam (примерно)', s.pointsEstimate],
+    ['Цена 100 очков', m(s.costPer100Points)],
+  ];
+  console.log('');
+  for (const [k, v] of rows) console.log(`  ${k.padEnd(34, '.')} ${v}`);
+  console.log('');
 }
